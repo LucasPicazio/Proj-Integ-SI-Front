@@ -1,0 +1,26 @@
+﻿@layout AuthenticateLayout
+@page "/Cadastro"
+
+<EditForm Model="@user" OnValidSubmit="@AddUserAsync" class="form-signin" oninput='inputConfirmPassword.setCustomValidity(inputConfirmPassword.value != inputPassword.value ? "Passwords do not match." : "")'>
+    <img class="mb-4" src="images/access-icon.PNG" width="72" height="72">
+    <h1 class="h3 mb-3 font-weight-normal">Por favor, insira seus dados</h1>
+    @if (!OperationResult)
+    {
+        <div class="alert alert-warning" role="alert">Falha no cadastro de usuário, tente mais tarde
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    <input type="text" id="inputFullName" class="form-control" @bind="user.FullName" placeholder="Nome Completo" required autofocus>
+    <input type="text" id="inputUserName" class="form-control" @bind="user.Username" placeholder="Nome de Usuário" required autofocus>
+    <input type="password" id="inputPassword" class="form-control" @bind="user.Password" placeholder="Senha" required autofocus>
+    <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Confirmar Senha" required autofocus>
+    <input type="tel" id="inputPhoneNumber" class="form-control" @bind="user.PhoneNumber" placeholder="Número de Telefone" required>
+    <input type="text" id="inputAddress" class="form-control" @bind="user.Address" placeholder="Endereço de Residência" required>
+    <input type="date" id="inputBirthday" class="form-control" @bind="user.Birthday" placeholder="Data de Nascimento">
+    <input type="email" id="inputEmail" class="form-control" @bind="user.Email" placeholder="E-mail" required>
+    <button class="my-3 btn-lg btn-primary btn-block" type="submit">Cadastrar-se</button>
+    <span>Já possui conta? <a class="navbar-brand" href="Login">Acesse-a</a></span>
+    <a class="navbar-brand" href=""><span class="oi oi-home" aria-hidden="true"> Página Inicial</span> </a>
+</EditForm>

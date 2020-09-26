@@ -1,16 +1,11 @@
 ﻿@page "/"
 
-@inject HttpClient Http
-@inject NotificationService notificationService
-
-
-<RadzenCard>
-    <RadzenLogin AllowRegister="true" AllowResetPassword="true" Username="@userName" Password="@userpassword"
-                 Login="@((args) => Login(args))" 
-                 ResetPassword="@(ResetPassword)"
-                 Register="@(Register)"
-                 Style="margin-bottom: 20px;" />
-</RadzenCard>
+<section id="titulo">
+    <div class="text-center py-5 px-2">
+        <h1 class="fonte-titulo texto-cor-especial">Loja Online Varejo</h1>
+        <p class="text-secondary">Nossas ofertas ajudam você a aproveitar melhor os alimentos, economizar, ganhar tempo e praticidade</p>
+    </div>
+</section>
 
 
 @code {
@@ -29,34 +24,20 @@
     }
 
 
-    private async Task Login(LoginArgs args)
-    {
-        var request = new auth { login = args.Username, password = args.Password };
+    //private async Task Login(LoginArgs args)
+    //{
+    //    var request = new Auth { Login = args.Username, Password = args.Password };
 
-        var message = new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Login", Detail = "Login realizado com sucesso", Duration = 4000 };
-        ShowNotification(message);
+    //    try
+    //    {
+    //        await Http.PostAsJsonAsync("http://localhost:8080/auth", request);
 
-        try
-        {
-            await Http.PostAsJsonAsync("http://localhost:8080/auth", request);
+    //    }
+    //    catch (Exception)
+    //    {
 
-        }
-        catch (Exception)
-        {
+    //    }
+    //}
 
-        }
-    }
 
-    void ShowNotification(NotificationMessage message)
-    {
-        notificationService.Notify();
-        StateHasChanged();
-
-    }
-
-    class auth
-    {
-        public string login { get; set; }
-        public string password { get; set; }
-    }
 }
