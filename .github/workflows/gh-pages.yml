@@ -16,11 +16,20 @@ jobs:
     - name: Publish with dotnet
       run: dotnet publish --output build
       working-directory: src
-    - name: Deploy to Github Pages
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+    - name: GCP Cloud Storae
+      # You may pin to the exact commit or the version.
+      # uses: abinmn/gcp-storage-bucket-action@db210e26048a30d98e1095b372b3b02b29432e65
+      uses: abinmn/gcp-storage-bucket-action@v1.0
       with:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BASE_BRANCH: master # The branch the action should deploy from.
-        BRANCH: gh-pages-from-actions # The branch the action should deploy to.
-        FOLDER: src/build/wwwroot # The folder the action should deploy.
-        SINGLE_COMMIT: true
+        # GCP service key encoded as base64. The account associated with the key should have permissions to make changes in storage bucket.
+        service_key: ${{ secrets.GKE_SA_KEY }}
+        # The folder you want to deploy. Default is the repository. You can change this value if you have a build step and point this to that build folder.
+        build_folder: src/build/wwwroot
+        # Bucket name
+        bucket_name: www.pikazio.com
+        # Name of the project that contains the storage bucket.
+        project: levapramim
+        # Path of your homepage in cloud storage bucket.
+        home_page_path: index.html
+        # Path of the 404 page to be shown
+        error_page_path: index.html
