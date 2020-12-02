@@ -1,0 +1,81 @@
+﻿@page "/Produto/Cadastro"
+@inject NavigationManager navigationManager
+@inject IProductService productService
+
+<h3>Cadastro de Produtos</h3>
+
+<div class="col-md-12 row">
+    @if (Error)
+    {
+        <div class="alert alert-warning col-md-12" role="alert">
+            O Serviço está fora do ar, tente mais tarde por favor.
+        </div>
+    }
+    <div class="col-md-2"></div>
+    <div class="col-md-4 ml-auto mr-0">
+        <EditForm Model="@Produto" OnValidSubmit="SaveProduct" class="py-5">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label>Nome do Produto*:</label>
+                <InputText class="form-control" @bind-Value="@Produto.ProductName" />
+                <ValidationMessage For="@(() => Produto.ProductName)" />
+            </div>
+            <div class="form-group">
+                <label>Tipo de Produto*:</label>
+                <InputText class="form-control" @bind-Value="@Produto.ProductType" />
+                <ValidationMessage For="@(() => Produto.ProductType)" />
+            </div>
+            <div class="form-group">
+                <label>Quantidade a ser Cadastrada* (Unidades):</label>
+                <InputNumber class="form-control" @bind-Value="@Produto.Stock" />
+                <ValidationMessage For="@(() => Produto.Stock)" />
+            </div>
+            <div class="form-group">
+                <label>Preço Unitário* (R$):</label>
+                <InputNumber class="form-control" @bind-Value="@Produto.Price" />
+                <ValidationMessage For="@(() =>Produto.Price)" />
+            </div>
+            <div class="form-group">
+                <label>Descrição do Produto*:</label>
+                <InputText class="form-control" @bind-Value="@Produto.Description" />
+                <ValidationMessage For="@(() =>Produto.Description)" />
+            </div>
+            <div class="form-group">
+                <label>Imagem do Produto (URL):</label>
+                <InputText class="form-control" @bind-Value="@Produto.ImageSource" />
+                <ValidationMessage For="@(() => Produto.ImageSource)" />
+            </div>
+            <button class="btn btn-primary py-3" type="submit">Cadastrar Produto</button>
+        </EditForm>
+    </div>
+    <div class="col-md-3" style="border-left: thick solid #808080">
+        @if (Produto.ImageSource != null)
+        {
+            <div class="prod-cadastro-img" style="margin-top:100px">
+                <img class="d-block w-100 h-100" style="object-fit:cover" src="@Produto.ImageSource" alt="Imagem do Produto a ser cadastrado">
+            </div>
+        }
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+@code {
+    public Product Produto;
+    private bool Error = false;
+
+    protected override void OnInitialized()
+    {
+        Produto = new Product();
+    }
+
+    private async Task SaveProduct()
+    {
+        var res = await productService.PostProduct(Produto);
+        Error = !res;
+
+        if (res)
+        {
+            navigationManager.NavigateTo($"Produto/{Produto.ProductName}/Detalhes");
+        }
+    }
+}

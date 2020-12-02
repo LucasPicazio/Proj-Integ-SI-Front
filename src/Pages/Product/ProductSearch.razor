@@ -1,0 +1,52 @@
+﻿@page "/Search/{SearchContext}"
+@inject IProductService productService
+
+<h3>Busca por "@SearchContext"</h3>
+
+<div class="row col-md-12">
+    <section id="abaFiltros" class="col-md-2 prod-list-bg py-3 row" style="height: 150px">
+        <EditForm Model="@Filter" OnValidSubmit="FilterProducts">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <div class="col-md-8 float-left">
+                    <label><strong>Preço Mínimo:</strong></label>
+                    <label><strong>Preço Máximo:</strong></label>
+                </div>
+                <div class="col-md-4 float-right">
+                    <InputNumber id="minPriceFilter" class="num-filter" @bind-Value="@Filter.MinPrice" />
+                    <ValidationMessage For="@(() => Filter.MinPrice)" />
+                    <InputNumber id="maxPriceFilter" class="num-filter" @bind-Value="@Filter.MaxPrice"/>
+                    <ValidationMessage For="@(() => Filter.MaxPrice)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="mx-auto d-block col-md-12 py-3">
+                    <button class="btn btn-secondary" type="submit">Filtrar</button>
+                </div>
+            </div>
+        </EditForm>
+    </section>
+    <section id="abaProdutos" class="col-md-10">
+        <div class="container d-flex flex-wrap justify-content-md-around justify-content-center prod-list-bg py-3">
+            <ProductCardList Products="SearchResult" />
+        </div>
+    </section>
+</div>
+@code {
+    [Parameter]
+    public string SearchContext { get; set; }
+
+    public List<Product> SearchResult { get; set; }
+    public ProductFilter Filter = new ProductFilter() { MaxPrice = 300, MinPrice = 1};
+
+    protected async override Task OnParametersSetAsync()
+    {
+        SearchResult = await productService.SearchProduct(SearchContext);
+    }
+
+    private void FilterProducts()
+    {
+        SearchResult.RemoveAll(p => p.Price < Filter.MinPrice || p.Price > Filter.MaxPrice);
+        StateHasChanged();
+    }
+}

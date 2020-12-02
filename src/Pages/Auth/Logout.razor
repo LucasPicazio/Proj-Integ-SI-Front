@@ -1,0 +1,14 @@
+﻿@page "/Logout"
+
+@inject IUserService userService
+@inject NavigationManager navigationManager
+
+<text>Saindo da conta</text>
+
+@code{
+    protected async override Task OnInitializedAsync()
+    {
+        await userService.Logout();
+        navigationManager.NavigateTo("");
+    }
+}

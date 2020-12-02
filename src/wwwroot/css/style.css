@@ -1,0 +1,49 @@
+﻿@media only screen and (min-width : 1224px) {
+    .imagem-carrossel {
+        object-fit: cover;
+        object-position: 0 70%;
+        height: 300px;
+    }
+}
+
+@media only screen and (max-width : 1224px) {
+    .imagem-carrossel {
+        object-fit: cover;
+        object-position: 0 80%;
+        height: 300px;
+    }
+}
+
+.prod-list-bg {
+    background-color: #FEF98C;
+    max-width: 100rem;
+}
+
+.card-largura {
+    width: 18rem;
+}
+
+.card-imagem-posicao {
+    height: 200px;
+    object-fit: cover;
+    object-position: 0 60%;
+}
+
+
+.borda-cor-especial {
+    border-color: #8D0606;
+}
+
+.btn-cor-especial {
+    background-color: #8D0606;
+    color: white;
+}
+
+.num-filter {
+    width: 70px;
+}
+
+.prod-cadastro-img {
+    width: 350px;
+    height: 350px;
+}

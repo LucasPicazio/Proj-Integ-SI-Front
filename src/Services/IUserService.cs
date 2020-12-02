@@ -1,4 +1,5 @@
-﻿using PSI_FRONT.Models;
+﻿using Microsoft.AspNetCore.Components.Authorization;
+using PSI_FRONT.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,9 @@ namespace PSI_FRONT.Services
 {
     public interface IUserService
     {
-        public Task<bool> GetLoginAuthenticationAsync(User user);
+        public Task SetLoginAuthenticationAsync(string token);
         public Task<bool> AddUserAsync(User newUser);
+        Task Logout();
+        Task<bool> Login(User user);
     }
 }

@@ -1,0 +1,22 @@
+﻿@layout AuthenticateLayout
+@page "/Login"
+
+
+<EditForm Model="@user" OnValidSubmit="@ValidateUser" class="form-signin">
+    <img class="mb-4" src="images/access-icon.png" width="72" height="72">
+    <h1 class="h3 mb-3 font-weight-normal">Por favor, acesse sua conta</h1>
+    @if (!OperationResult)
+    {
+        <div class="alert alert-warning" role="alert">
+            Credenciais inválidas
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+    <input type="text" id="inputUserName" class="form-control" @bind="user.Username" placeholder="Usuário" required autofocus>
+    <input type="password" id="inputPassword" class="form-control" @bind="user.Password" placeholder="Senha" required>
+    <button class="my-3 btn-lg btn-primary btn-block" type="submit">Login</button>
+    <span>Não possui conta? </span> <a class="navbar-brand" href="Cadastro">Cadastre-se</a>
+    <a class="navbar-brand" href=""><span class="oi oi-home" aria-hidden="true"> Página Inicial</span> </a>
+</EditForm>

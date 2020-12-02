@@ -3,35 +3,33 @@ using PSI_FRONT.Models;
 using PSI_FRONT.Services;
 using System.Threading.Tasks;
 
-namespace PSI_FRONT.Pages
+namespace PSI_FRONT.Pages.Auth
 {
-    public partial class Login
+    public partial class Cadastro
     {
-        [Inject]
-        IUserService UserService { get; set; }
-
+        private User user { get; set; }
         private bool OperationResult { get; set; }
 
         [Inject]
         NavigationManager Navigation { get; set; }
 
-        private User user;
+        [Inject]
+        private IUserService UserService { get; set; }
 
-        protected async override Task OnInitializedAsync()
+        protected async override void OnInitialized()
         {
             user = new User();
             OperationResult = true;
         }
 
-        private async Task ValidateUser()
-        {
-            OperationResult = await UserService.GetLoginAuthenticationAsync(user);
+        private async Task AddUserAsync()
+{
+            OperationResult = await UserService.AddUserAsync(user);
 
             if (OperationResult)
             {
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/Login");
             }
         }
-
     }
 }

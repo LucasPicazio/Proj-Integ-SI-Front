@@ -1,0 +1,12 @@
+﻿@inject IJSRuntime js
+
+
+<GenericList List="Products">
+    <ElementTemplate Context="product">
+        <ProductCard Product="product" />
+    </ElementTemplate>
+</GenericList>
+
+@code {
+    [Parameter] public List<Product> Products { get; set; }
+}

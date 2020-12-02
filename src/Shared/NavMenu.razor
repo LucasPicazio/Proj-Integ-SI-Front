@@ -1,40 +1,78 @@
-﻿
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+﻿@inject NavigationManager navigationManager
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="p-3">
         <a class="navbar-brand" href="">
             <img class="d-inline-block align-top" width="30" height="30" src="images/varejo-logo.png">
             Varejo
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-            <ul class="navbar-nav nav flex-row justify-content-end">
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                        <span class="oi oi-home" aria-hidden="true"></span> Página Inicial
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="login">
-                        <span class="oi oi-account-login" aria-hidden="true"></span> Login
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="Cadastro">
-                        <span class="oi oi-plus" aria-hidden="true"></span> Cadastre-se
-                    </NavLink>
-                </li>
-            </ul>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-around" id="navbarNavAltMarkup">
+        <div class="form-row">
+            <EditForm Model="@Product" OnValidSubmit="SearchProduct">
+                <InputText id="searchProductField" style="width: 350px;" placeholder="Procure pelos seus produtos de escolha" 
+                           data-toggle="tooltip" data-placement="bottom" title="Insira algum texto para buscar" @bind-Value="@Product.Description" />
+                <button class="btn btn-primary" type="submit">Buscar</button>
+            </EditForm>
         </div>
-    </nav>
-    @*<AuthorizeView>
-        <Authorized>
-            Hello, @context.User.Identity.Name!
-            <button class="nav-link btn btn-link" @onclick="BeginSignOut">
-                Log out
-            </button>
-        </Authorized>
-        <NotAuthorized>
-            <a href="authentication/login">Log in</a>
-        </NotAuthorized>
-    </AuthorizeView>*@
+        <ul class="navbar-nav nav flex-row">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="Produto/Cadastro">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Cadastrar Produto
+                </NavLink>
+            </li>
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="CadastroProduto">
+                            <span class="oi oi-list-rich" aria-hidden="true"></span> Cadastrar Produto
+                        </NavLink>
+                    </li>
+                </Authorized>
+            </AuthorizeView>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="Carrinho">
+                    <span class="oi oi-cart" aria-hidden="true"></span> Carrinho
+                </NavLink>
+            </li>
+            <AuthorizeView>
+                <Authorized>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="Logout">
+                            <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
+                        </NavLink>
+                    </li>
+                </Authorized>
+                <NotAuthorized>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="Login">
+                            <span class="oi oi-account-login" aria-hidden="true"></span> Login
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="Cadastro">
+                            <span class="oi oi-plus" aria-hidden="true"></span> Cadastre-se
+                        </NavLink>
+                    </li>
+                </NotAuthorized>
+            </AuthorizeView>
+        </ul>
+    </div>
+</nav>
+
+
+
+@code{
+    public Product Product = new Product();
+
+    protected async Task SearchProduct()
+    {
+        if (!string.IsNullOrEmpty(Product.Description))
+        {
+            navigationManager.NavigateTo($"Search/{Product.Description}");
+        }
+    }
+}
