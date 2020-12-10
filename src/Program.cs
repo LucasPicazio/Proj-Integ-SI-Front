@@ -15,7 +15,6 @@ namespace PSI_FRONT
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-            //builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             ConfigureServices(builder.Services, builder.Configuration.GetValue<string>("BaseURL"));
 
             await builder.Build().RunAsync();
