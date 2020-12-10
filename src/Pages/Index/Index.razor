@@ -1,6 +1,11 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
 @inject IProductService productService
+@inject IWebAssemblyHostEnvironment HostEnvironment
 
+<h1>Environment example</h1>
+
+<p>Environment: @HostEnvironment.Environment</p>
 <section id="carousel">
     <MainCarousel />
 </section>
@@ -8,12 +13,13 @@
 <section id="titulo">
     <div class="text-center py-2 px-2">
         <h1 class="fonte-titulo texto-cor-especial">Loja Online Varejo</h1>
+
         <p class="text-secondary">Nossas ofertas ajudam você a aproveitar melhor os alimentos, economizar, ganhar tempo e praticidade</p>
     </div>
 </section>
 <section id="abaProdutos" class="row">
     <div class="container d-flex flex-wrap justify-content-md-around justify-content-center prod-list-bg py-3">
-        <ProductCardList Products="Products"/>
+        <ProductCardList Products="Products" />
     </div>
 </section>
 
