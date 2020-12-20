@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PSI_FRONT.Helpers;
 using PSI_FRONT.Services;
 
 namespace PSI_FRONT
@@ -24,6 +25,7 @@ namespace PSI_FRONT
         {
             services.AddAuthorizationCore();
             services.AddScoped<UserService>();
+            services.AddScoped<IHttpService, HttpService>();
             services.AddScoped<AuthenticationStateProvider>(
                 provider => provider.GetRequiredService<UserService>()
             );

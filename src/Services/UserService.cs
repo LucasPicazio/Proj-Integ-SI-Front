@@ -17,16 +17,16 @@ namespace PSI_FRONT.Services
     public class UserService : AuthenticationStateProvider, IUserService
     {
         private readonly IJSRuntime js;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpService _httpService;
         private readonly string TOKENKEY = "TOKENKEY";
 
         private AuthenticationState Anonymous =>
             new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
-        public UserService(IJSRuntime js, HttpClient httpClient)
+        public UserService(IJSRuntime js, IHttpService httpService)
         {
             this.js = js;
-            _httpClient = httpClient;
+            _httpService = httpService;
         }
 
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -45,9 +45,8 @@ namespace PSI_FRONT.Services
         {
             try
             {
-                var authUser = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync($"api/members/login", authUser);
-                if (response.IsSuccessStatusCode)
+                var response = await _httpService.Post<User>($"api/members/login", user);
+                if (response.Success)
                 {
                     await SetLoginAuthenticationAsync(JsonSerializer.Serialize(user, new JsonSerializerOptions { IgnoreNullValues = true }));
                     return true;
@@ -70,24 +69,18 @@ namespace PSI_FRONT.Services
 
         public async Task Logout()
         {
+            _httpService.SetAuthorizationHeader(null);
             await js.RemoveItem(TOKENKEY);
-            _httpClient.DefaultRequestHeaders.Authorization = null;
             NotifyAuthenticationStateChanged(Task.FromResult(Anonymous));
         }
 
 
         public async Task<bool> AddUserAsync(User newUser)
         {
-            var user = new StringContent(JsonSerializer.Serialize(newUser), Encoding.UTF8, "application/json");
             try
             {
-                var response = await _httpClient.PostAsync($"api/members/save", user);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return true;
-                }
-                return false;
+                var response = await _httpService.Post<User>($"api/members/save", newUser);
+                return response.Success;
             }
             catch (Exception)
             {
@@ -98,8 +91,10 @@ namespace PSI_FRONT.Services
 
         private AuthenticationState BuildAuthenticationState(string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromToken(token), "jwt")));
+            _httpService.SetAuthorizationHeader(new AuthenticationHeaderValue("bearer", token));
+            var identityClaims = new ClaimsIdentity(ParseClaimsFromToken(token), "jwt");
+            var principalClaims = new ClaimsPrincipal(identityClaims);
+            return new AuthenticationState(principalClaims);
         }
 
         private IEnumerable<Claim> ParseClaimsFromToken(string token)

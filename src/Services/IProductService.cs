@@ -8,7 +8,7 @@ namespace PSI_FRONT.Services
     {
         Task<List<Product>> GetAllProducts();
         Task<List<Product>> SearchProduct(string searchItem);
-        Task<Product> GetProduct(string prodName);
+        Task<Product> GetProductByName(string prodName);
         Task<bool> PostProduct(Product prod);
     }
 }

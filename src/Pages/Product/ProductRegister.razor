@@ -5,7 +5,7 @@
 <h3>Cadastro de Produtos</h3>
 
 <div class="col-md-12 row">
-    @if (Error)
+    @if (ErrorHasOccurred)
     {
         <div class="alert alert-warning col-md-12" role="alert">
             O Serviço está fora do ar, tente mais tarde por favor.
@@ -61,7 +61,7 @@
 
 @code {
     public Product Produto;
-    private bool Error = false;
+    private bool ErrorHasOccurred = false;
 
     protected override void OnInitialized()
     {
@@ -71,7 +71,7 @@
     private async Task SaveProduct()
     {
         var res = await productService.PostProduct(Produto);
-        Error = !res;
+        ErrorHasOccurred = !res;
 
         if (res)
         {

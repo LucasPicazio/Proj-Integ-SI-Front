@@ -54,6 +54,6 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-        Produto = await productService.GetProduct(ProductName);
+        Produto = await productService.GetProductByName(ProductName);
     }
 }
