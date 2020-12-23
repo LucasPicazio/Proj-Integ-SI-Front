@@ -29,16 +29,19 @@
     [CascadingParameter]
     private Task<AuthenticationState> AuthenticationState { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var authState = await AuthenticationState;
-        var user = authState.User;
-
-        if (user.Identity.IsAuthenticated)
+        if (!firstRender)
         {
-            var userId = await userService.GetUserIdFromToken();
-            UserCarts = await cartService.GetUserCarts(userId);
-            UserId = userId;
+            var authState = await AuthenticationState;
+            var user = authState.User;
+
+            if (user.Identity.IsAuthenticated)
+            {
+                var userId = await userService.GetUserIdFromToken();
+                UserCarts = await cartService.GetUserCarts(userId);
+                UserId = userId;
+            }
         }
     }
 
