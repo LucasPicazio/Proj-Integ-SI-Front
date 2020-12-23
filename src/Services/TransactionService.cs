@@ -2,6 +2,7 @@
 using PSI_FRONT.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PSI_FRONT.Services
@@ -17,20 +18,21 @@ namespace PSI_FRONT.Services
 
         public async Task<List<Transaction>> GetUserTransactions(int userId)
         {
-            List<Transaction> cartList = new List<Transaction>();
+            List<Transaction> transactionList = new List<Transaction>();
             try
             {
                 var response = await _httpService.Get<List<Transaction>>($"api/transaction/search/member/{userId}");
                 if (response.Success)
                 {
-                    cartList = response.Response;
+                    transactionList = response.Response;
+                    transactionList = transactionList.OrderByDescending(t => t.Date).ToList();
                 }
             }
             catch (Exception)
             {
-                return cartList;
+                return transactionList;
             }
-            return cartList;
+            return transactionList;
         }
 
         public async Task<List<int>> PostInsertUserCarts(List<Cart> userCarts)
