@@ -23,21 +23,24 @@ namespace PSI_FRONT
 
         private static void ConfigureServices(IServiceCollection services, string baseAddress)
         {
-            services.AddAuthorizationCore();
-            services.AddScoped<UserService>();
-            services.AddScoped<IHttpService, HttpService>();
-            services.AddScoped<AuthenticationStateProvider>(
-                provider => provider.GetRequiredService<UserService>()
-            );
-            services.AddScoped<IUserService, UserService>(
-                provider => provider.GetRequiredService<UserService>()
-            );
-            services.AddScoped<IProductService, ProductService>();
-
             services.AddSingleton(new HttpClient
             {
                 BaseAddress = new Uri(baseAddress)}
             );
+            services.AddAuthorizationCore();
+            services.AddScoped<UserService>();
+            services.AddScoped<IHttpService, HttpService>();
+            services.AddScoped<IDisplayMessage, DisplayMessage>();
+            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IUserService, UserService>(
+                provider => provider.GetRequiredService<UserService>()
+            );
+            services.AddScoped<AuthenticationStateProvider>(
+                provider => provider.GetRequiredService<UserService>()
+            );
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICartService, CartService>();
+
         }
     }
 }

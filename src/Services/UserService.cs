@@ -1,7 +1,5 @@
 ﻿using PSI_FRONT.Models;
 using System;
-using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -45,16 +43,23 @@ namespace PSI_FRONT.Services
         {
             try
             {
-                var response = await _httpService.Post<User>($"api/members/login", user);
+                var response = await _httpService.Post<User, int>($"api/members/login", user);
                 if (response.Success)
                 {
-                    await SetLoginAuthenticationAsync(JsonSerializer.Serialize(user, new JsonSerializerOptions { IgnoreNullValues = true }));
+                    var userDTO = new UserToken()
+                    {
+                        UserId = response.Response.ToString(),
+                        Username = user.Username,
+                        Password = user.Password
+                    };
+                    await SetLoginAuthenticationAsync(JsonSerializer.Serialize(userDTO, new JsonSerializerOptions { IgnoreNullValues = true }));
                     return true;
                 }
                 return false;
             }
             catch (Exception)
             {
+                await Logout();
                 return false;
             }
         }
@@ -79,7 +84,7 @@ namespace PSI_FRONT.Services
         {
             try
             {
-                var response = await _httpService.Post<User>($"api/members/save", newUser);
+                var response = await _httpService.Post<User>($"api/members/register", newUser);
                 return response.Success;
             }
             catch (Exception)
@@ -89,12 +94,23 @@ namespace PSI_FRONT.Services
 
         }
 
+        public async Task<int> GetUserIdFromToken()
+        {
+            var token = await js.GetFromLocalStorage(TOKENKEY);
+            if (!string.IsNullOrEmpty(token)) {
+                var userTkn = JsonSerializer.Deserialize<UserToken>(token);
+                return Convert.ToInt32(userTkn.UserId);
+            }
+            return -1;
+        }
+
         private AuthenticationState BuildAuthenticationState(string token)
         {
             _httpService.SetAuthorizationHeader(new AuthenticationHeaderValue("bearer", token));
             var identityClaims = new ClaimsIdentity(ParseClaimsFromToken(token), "jwt");
             var principalClaims = new ClaimsPrincipal(identityClaims);
             return new AuthenticationState(principalClaims);
+
         }
 
         private IEnumerable<Claim> ParseClaimsFromToken(string token)

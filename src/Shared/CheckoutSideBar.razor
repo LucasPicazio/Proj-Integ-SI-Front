@@ -1,0 +1,57 @@
+﻿<div id="mySidebar" class="sidebar">
+    <div class="col-sm-12">
+        <div class="row">
+            <div class="col-sm-8">
+                <h3 style="text-align:center; padding-top:20px;">Carrinho</h3>
+            </div>
+            <div class="col-sm-4">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+            </div>
+        </div>
+        @if (CartList != null && CartList.Any())
+        {
+            <div class="row">
+                <div class="col-sm-12 py-3">
+                    <button class="btn btn-outline-success py-3 w-100" @onclick="@onConfirmCheckout" type="button">Finalizar Compra</button>
+                </div>
+            </div>
+            @foreach (var cart in CartList)
+            {
+                <div class="row" style="padding-left:20px; border-top: 3px solid #8D0606;">
+                    <div class="col-sm-8">
+                        <a href="/Produto/@cart.Product.ProductId/Detalhes">@cart.Product.ProductName</a>
+                    </div>
+                    <div class="col-sm-4">
+                        <button class="btn-danger" style="margin-top:-1px" @onclick="() => onCancelItem.InvokeAsync(cart.CartId)"><span class="oi oi-trash"></span></button>
+                    </div>
+                    <div class="col-sm-12">
+                        <span>Id: @cart.CartId</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span>R$: @cart.Product.Price</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span>@cart.Quantity Unidades</span>
+                    </div>
+                    <div class="col-sm-12">
+                        <span style="float:right; padding-right:30px"><strong>Total: </strong> R$ @(cart.Product.Price * cart.Quantity)</span>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <span style="text-align:center">Não há Produtos no Carrinho</span>
+        }
+    </div>
+</div>
+
+
+@code{
+    [Parameter]
+    public List<Cart> CartList { get; set; }
+    [Parameter]
+    public EventCallback onConfirmCheckout { get; set; }
+    [Parameter]
+    public EventCallback<int> onCancelItem { get; set; }
+}

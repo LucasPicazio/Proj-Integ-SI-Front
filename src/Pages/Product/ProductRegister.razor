@@ -1,6 +1,7 @@
 ﻿@page "/Produto/Cadastro"
 @inject NavigationManager navigationManager
 @inject IProductService productService
+@attribute [Authorize]
 
 <h3>Cadastro de Produtos</h3>
 
@@ -37,7 +38,7 @@
             </div>
             <div class="form-group">
                 <label>Descrição do Produto*:</label>
-                <InputText class="form-control" @bind-Value="@Produto.Description" />
+                <InputTextArea class="form-control" @bind-Value="@Produto.Description" />
                 <ValidationMessage For="@(() =>Produto.Description)" />
             </div>
             <div class="form-group">
@@ -53,6 +54,12 @@
         {
             <div class="prod-cadastro-img" style="margin-top:100px">
                 <img class="d-block w-100 h-100" style="object-fit:cover" src="@Produto.ImageSource" alt="Imagem do Produto a ser cadastrado">
+            </div>
+        }
+        else
+        {
+            <div class="prod-cadastro-img" style="margin-top:100px">
+                <img class="d-block w-100 h-100" style="object-fit:cover" src="images/no_photo.png" alt="Imagem do Produto a ser cadastrada">
             </div>
         }
     </div>
@@ -71,11 +78,15 @@
     private async Task SaveProduct()
     {
         var res = await productService.PostProduct(Produto);
-        ErrorHasOccurred = !res;
 
-        if (res)
+        if (res >= 0)
         {
-            navigationManager.NavigateTo($"Produto/{Produto.ProductName}/Detalhes");
+            ErrorHasOccurred = false;
+            navigationManager.NavigateTo($"Produto/{res}/Detalhes");
+        }
+        else
+        {
+            ErrorHasOccurred = true;
         }
     }
 }

@@ -5,6 +5,9 @@ namespace PSI_FRONT.Models
 {
     public class Product
     {
+        [JsonPropertyName("productId")]
+        public int ProductId { get; set; }
+
         [Required(ErrorMessage = "Esse campo é obrigatório")]
         [JsonPropertyName("productName")]
         public string ProductName { get; set; }

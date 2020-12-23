@@ -1,4 +1,7 @@
 ﻿@inject NavigationManager navigationManager
+@inject ICartService cartService
+@inject IUserService userService
+@inject IJSRuntime js
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
     <div class="p-3">
@@ -13,33 +16,27 @@
     <div class="collapse navbar-collapse justify-content-around" id="navbarNavAltMarkup">
         <div class="form-row">
             <EditForm Model="@Product" OnValidSubmit="SearchProduct">
-                <InputText id="searchProductField" style="width: 350px;" placeholder="Procure pelos seus produtos de escolha" 
+                <InputText id="searchProductField" style="width: 350px;" placeholder="Procure pelos seus produtos de escolha"
                            data-toggle="tooltip" data-placement="bottom" title="Insira algum texto para buscar" @bind-Value="@Product.Description" />
                 <button class="btn btn-primary" type="submit">Buscar</button>
             </EditForm>
         </div>
         <ul class="navbar-nav nav flex-row">
-            <li class="nav-item">
-                <NavLink class="nav-link" href="Produto/Cadastro">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span> Cadastrar Produto
-                </NavLink>
-            </li>
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <li class="nav-item">
-                        <NavLink class="nav-link" href="CadastroProduto">
-                            <span class="oi oi-list-rich" aria-hidden="true"></span> Cadastrar Produto
-                        </NavLink>
-                    </li>
-                </Authorized>
-            </AuthorizeView>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="Carrinho">
-                    <span class="oi oi-cart" aria-hidden="true"></span> Carrinho
-                </NavLink>
-            </li>
             <AuthorizeView>
                 <Authorized>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="Produto/Cadastro">
+                            <span class="oi oi-tags" aria-hidden="true"></span> Cadastrar Produto
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <button type="submit" @onclick="()=>ExpandNav()" class="nav-link btn btn-link"><i class="oi oi-cart"></i> Carrinho</button>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="Historico/Compras">
+                            <i class="fa fa-history"></i> Histórico
+                        </NavLink>
+                    </li>
                     <li class="nav-item">
                         <NavLink class="nav-link" href="Logout">
                             <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
@@ -62,11 +59,35 @@
         </ul>
     </div>
 </nav>
+<CheckoutSideBar CartList="@UserCarts" onCancelItem="onCartItemRemove" onConfirmCheckout="onConfirmCheckout" />
 
 
 
 @code{
     public Product Product = new Product();
+
+    [Parameter]
+    public EventCallback<int> onCartItemRemove { get; set; }
+    [Parameter]
+    public EventCallback onConfirmCheckout { get; set; }
+
+    [CascadingParameter]
+    public List<Cart> UserCarts { get; set; }
+
+    private bool navExpanded { get; set; }
+
+    private async Task ExpandNav()
+    {
+        if (navExpanded)
+        {
+            await js.InvokeVoidAsync("closeNav");
+        }
+        else
+        {
+            await js.InvokeVoidAsync("openNav");
+        }
+        navExpanded = !navExpanded;
+    }
 
     protected void SearchProduct()
     {

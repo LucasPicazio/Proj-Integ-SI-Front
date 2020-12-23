@@ -5,6 +5,10 @@ namespace PSI_FRONT.Models
 {
     public class User
     {
+        
+        [JsonPropertyName("memberId")]
+        public int UserId { get; set; }
+
         [JsonPropertyName("USERNAME")]
         public string Username { get; set; }
 

@@ -1,9 +1,16 @@
 ﻿<article class="card borda-cor-especial card-largura mt-5">
-    <img src="@Product.ImageSource" class="card-img-top card-imagem-posicao" alt="@Product.Description">
+    @if (Product.ImageSource != null)
+    {
+        <img src="@Product.ImageSource" class="card-img-top card-imagem-posicao" alt="@Product.Description">
+    }
+    else
+    {
+        <img src="images/no_photo.png" class="card-img-top card-imagem-posicao" alt="@Product.Description">
+    }
     <div class="card-body">
         <h5 class="card-title">@Product.ProductName</h5>
         <p class="card-text">@Product.Description</p>
-        <a href="/Produto/@Product.ProductName/Detalhes" class="btn btn-cor-especial">Veja Mais!</a>
+        <a href="/Produto/@Product.ProductId/Detalhes" class="btn btn-cor-especial">Veja Mais!</a>
     </div>
 </article>
 

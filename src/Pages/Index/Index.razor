@@ -1,7 +1,6 @@
 ﻿@page "/"
 @inject IProductService productService
 
-
 <section id="carousel">
     <MainCarousel />
 </section>
@@ -27,4 +26,5 @@
         var response = await productService.GetAllProducts();
         Products = response;
     }
+
 }

@@ -1,10 +1,88 @@
 ﻿@inherits LayoutComponentBase
+@inject ICartService cartService
+@inject IUserService userService
+@inject ITransactionService transactionService
+@inject IDisplayMessage displayMessage
 
-    <div class="main">
-        <div>
-            <NavMenu />
-        </div>
-        <div class="content py-5 px-4">
-            @Body
-        </div>
+<div class="main" id="main">
+    <div>
+        <CascadingValue Value="@UserCarts">
+            <NavMenu onCartItemRemove="@RemoveCartItem" onConfirmCheckout="onCheckoutCalled"/>
+        </CascadingValue>
     </div>
+    <div class="content py-5 px-4">
+        <ConfirmationModal @ref="modal" Title="Deseja finalizar a compra?" onCancel="()=>modal.Hide()" onConfirm="EndTransaction">
+            <ChildContent>
+                <span>Caso confirme, todos os produtos do seu carrinho serão retirados para a realização das transações</span>
+            </ChildContent>
+        </ConfirmationModal>
+        <CascadingValue Value="@UserCarts">
+            @Body
+        </CascadingValue>
+    </div>
+</div>
+
+@code{
+    public List<Cart> UserCarts = new List<Cart>();
+    private ConfirmationModal modal { get; set; }
+    private int UserId { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationState;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var userId = await userService.GetUserIdFromToken();
+            UserCarts = await cartService.GetUserCarts(userId);
+            UserId = userId;
+        }
+    }
+
+    protected async Task onCheckoutCalled()
+    {
+        modal.Show();
+    }
+
+    protected async Task EndTransaction()
+    {
+
+        var res = await transactionService.PostInsertUserCarts(UserCarts);
+        if (res.Any())
+        {
+            modal.Hide();
+            var emptyCart = await cartService.RemoveUserCarts(UserId);
+            if (emptyCart)
+            {
+                UserCarts.Clear();
+                StateHasChanged();
+                await displayMessage.DisplaySuccessMessage("Compra finalizada com sucesso, agradecemos sua preferência!");
+            }
+            else
+            {
+                await displayMessage.DisplayErrorMessage("Ocorreu algum problema na limpeza do seu carrinho, não se preocupe, cheque seu histórico de compras antes de tentar novamente");
+            }
+        }
+        else
+        {
+            await displayMessage.DisplayErrorMessage("Ocorreu um erro na geração de transições da compra, tente mais tarde");
+        }
+    }
+
+    protected async Task RemoveCartItem(int cartId)
+    {
+        var removed = await cartService.RemoveCartAsync(cartId);
+        if (removed)
+        {
+            UserCarts.RemoveAll(c => c.CartId == cartId);
+            StateHasChanged();
+        }
+        else
+        {
+            await displayMessage.DisplayErrorMessage("Ocorreu um problema na remoção do item do seu carrinho, tente mais tarde");
+        }
+    }
+}

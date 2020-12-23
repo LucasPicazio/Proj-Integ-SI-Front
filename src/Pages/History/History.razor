@@ -1,0 +1,33 @@
+﻿@page "/Historico/Compras"
+@inject IUserService userService
+@inject ITransactionService transactionService
+
+<h3>Seu histórico de Compras</h3>
+<div class="col-md-12">
+    @if (UserTransactions != null && UserTransactions.Any())
+    {
+        @foreach (var transac in UserTransactions)
+        {
+            <HistoryItem Transaction="@transac"/>
+        }
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+
+    private List<Transaction> UserTransactions { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationState;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var userId = await userService.GetUserIdFromToken();
+            UserTransactions = await transactionService.GetUserTransactions(userId);
+        }
+    }
+}

@@ -16,7 +16,7 @@ namespace PSI_FRONT.Pages.Auth
         [Inject]
         private IUserService UserService { get; set; }
 
-        protected async override void OnInitialized()
+        protected override void OnInitialized()
         {
             user = new User();
             OperationResult = true;

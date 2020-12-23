@@ -1,0 +1,62 @@
+﻿@if (Transaction == null)
+{
+    <p>Carregando...</p>
+}
+else
+{
+    <div class="row py-3">
+        <div class="col-md-2">
+            @if (Transaction.Product.ImageSource != null)
+            {
+                <div>
+                    <img class="d-block w-100 h-100" style="object-fit:cover" src="@Transaction.Product.ImageSource" alt="Imagem do Produto comprado">
+                </div>
+            }
+            else
+            {
+                <div>
+                    <img class="d-block w-100 h-100" style="object-fit:cover" src="images/no_photo.png" alt="Imagem do Produto comprado">
+                </div>
+            }
+        </div>
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-6">
+                    <span style="font-size:24px"><strong>@Transaction.Product.ProductName</strong></span>
+                    <a href="Produto/@Transaction.Product.ProductId/Detalhes"><span class="oi oi-link-intact"></span></a>
+                </div>
+                <div class="col-md-6"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <span>@Transaction.Product.Description</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-1">
+                    <span>R$ @Transaction.Product.Price</span>
+                </div>
+                <div class="col-md-1">
+                    <span>Unidades: @Transaction.Quantity</span>
+                </div>
+                <div class="col-md-1">
+                    <span>@DateTime.Parse(Transaction.Date).ToString()</span>
+                </div>
+                <div class="col-md-9"></div>
+            </div>
+            <div class="row">
+                <div class="1">
+                    <span><strong>Total: R$</strong> @(Transaction.Product.Price*Transaction.Quantity)</span>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+}
+
+@code{
+    [Parameter]
+    public Transaction Transaction { get; set; }
+
+}

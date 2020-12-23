@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -35,10 +36,18 @@ namespace PSI_FRONT.Helpers
 
         public async Task<HttpResponseWrapper<object>> Post<T>(string url, T data)
         {
-            var dataJson = JsonSerializer.Serialize(data);
-            var stringContent = new StringContent(dataJson, Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync(url, stringContent);
-            return new HttpResponseWrapper<object>(null, response.IsSuccessStatusCode, response);
+            try
+            {
+                var dataJson = JsonSerializer.Serialize(data);
+                var stringContent = new StringContent(dataJson, Encoding.UTF8, "application/json");
+                var response = await httpClient.PostAsync(url, stringContent);
+                return new HttpResponseWrapper<object>(null, response.IsSuccessStatusCode, response);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return null;
         }
 
         public async Task<HttpResponseWrapper<TResponse>> Post<T, TResponse>(string url, T data)

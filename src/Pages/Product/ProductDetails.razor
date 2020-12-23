@@ -1,7 +1,10 @@
-﻿@page "/Produto/{ProductName}/Detalhes"
+﻿@page "/Produto/{ProductId:int}/Detalhes"
+@inject NavigationManager navigationManager
 @inject IProductService productService
+@inject ICartService cartService
+@inject IUserService userService
+@inject IDisplayMessage displayMessage
 
-<h3>Detalhes do Produto "@ProductName"</h3>
 
 @if (Produto == null)
 {
@@ -9,51 +12,120 @@
 }
 else
 {
-<div class="col-md-12 row">
-    <div class="col-md-2"></div>
-    <div class="col-md-4 ml-auto mr-0">
-        <div class="form-group">
-            <label>Nome do Produto:</label>
-            <input type="text" disabled value="@Produto.ProductName"/>
-        </div>
-        <div class="form-group">
-            <label>Tipo de Produto:</label>
-            <input type="text" disabled value="@Produto.ProductType"/>
-        </div>
-        <div class="form-group">
-            <label>Quantidade a ser Cadastrada (Unidades): </label>
-            <input type="text" disabled value="@Produto.Stock"/>
-        </div>
-        <div class="form-group">
-            <label>Preço Unitário (R$):</label>
-            <input type="text" disabled value="@Produto.Price"/>
-        </div>
-        <div class="form-group">
-            <label>Descrição do Produto:</label>
-            <textarea type="" disabled value="@Produto.Description" style="width:400px; height:60px"/>
-        </div>
-        <button class="btn btn-cor-especial py-3" type="submit">Adicionar ao Carrinho</button>
-    </div>
-    <div class="col-md-3" style="border-left: thick solid #808080">
-        @if (Produto.ImageSource != null)
-        {
-            <div class="prod-cadastro-img" style="margin-top:100px">
-                <img class="d-block w-100 h-100" style="object-fit:cover" src="@Produto.ImageSource" alt="Imagem do Produto a ser cadastrado">
+    <ConfirmationModal @ref="modal" Title="Selecione a quantia desejada do produto" onCancel="()=>modal.Hide()" onConfirm="OnClickAddToCart">
+        <ChildContent>
+            <EditForm Model="@CartItem" OnValidSubmit="OnClickAddToCart" class="py-5">
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label>Quantidade desejada* (Unidades):</label>
+                    <InputNumber class="form-control" @bind-Value="@CartItem.Quantity" />
+                    <ValidationMessage For="@(() => CartItem.Quantity)" />
+                </div>
+            </EditForm>
+        </ChildContent>
+    </ConfirmationModal>
+    <h3>Detalhes do Produto "@Produto.ProductName"</h3>
+    <div class="col-md-12 row">
+        <div class="col-md-2"></div>
+        <div class="col-md-4 ml-auto mr-0">
+            <div class="form-group">
+                <label>Nome do Produto:</label>
+                <input type="text" disabled value="@Produto.ProductName" />
             </div>
-        }
+            <div class="form-group">
+                <label>Tipo de Produto:</label>
+                <input type="text" disabled value="@Produto.ProductType" />
+            </div>
+            <div class="form-group">
+                <label>Quantidade disponível (Unidades): </label>
+                <input type="text" disabled value="@Produto.Stock" />
+            </div>
+            <div class="form-group">
+                <label>Preço Unitário (R$):</label>
+                <input type="text" disabled value="@Produto.Price" />
+            </div>
+            <div class="form-group">
+                <label>Descrição do Produto:</label>
+                <textarea type="" disabled value="@Produto.Description" style="width:400px; height:60px" />
+            </div>
+            @if (AddToCartAuthorization)
+            {
+                <button class="btn btn-cor-especial py-3" type="button" @onclick="() => modal.Show()">Adicionar ao Carrinho</button>
+            }
+            else
+            {
+                <button class="btn btn-cor-especial py-3" disabled type="button">Adicionar ao Carrinho</button>
+            }
+        </div>
+        <div class="col-md-3" style="border-left: thick solid #808080">
+            @if (Produto.ImageSource != null)
+            {
+                <div class="prod-cadastro-img" style="margin-top:100px">
+                    <img class="d-block w-100 h-100" style="object-fit:cover" src="@Produto.ImageSource" alt="Imagem do Produto a ser cadastrado">
+                </div>
+            }
+        </div>
+        <div class="col-md-3"></div>
     </div>
-    <div class="col-md-3"></div>
-</div>
 }
 
 @code {
     [Parameter]
-    public string ProductName { get; set; }
+    public int ProductId { get; set; }
+    public Cart CartItem { get; set; }
 
+    public EventCallback<Cart> OnCartItemAdded { get; set; }
+
+    [CascadingParameter]
+    public List<Cart> UserCarts { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+
+
+    private ConfirmationModal modal { get; set; }
     private Product Produto { get; set; }
+    private bool AddToCartAuthorization { get; set; }
 
-    protected async override Task OnInitializedAsync()
+
+    protected override async Task OnInitializedAsync()
     {
-        Produto = await productService.GetProductByName(ProductName);
+        Produto = await productService.GetProductById(ProductId);
+        StateHasChanged();
     }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationState;
+        var user = authState.User;
+
+        AddToCartAuthorization = user.Identity.IsAuthenticated;
+        if (user.Identity.IsAuthenticated)
+        {
+            CartItem = new Cart()
+            {
+                Product = Produto,
+                User = new User() { UserId = await userService.GetUserIdFromToken() }
+            };
+        }
+        StateHasChanged();
+    }
+
+    private async Task OnClickAddToCart()
+    {
+        var res = await cartService.AddCartAsync(CartItem);
+        if (res != -1)
+        {
+            UserCarts.Add(CartItem);
+            modal.Hide();
+            StateHasChanged();
+            await displayMessage.DisplaySuccessMessage("O Produto foi adicionado no seu carrinho!");
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            await displayMessage.DisplayErrorMessage("Ocorreu um problema na inclusão do item no seu carrinho, tente mais tarde");
+        }
+    }
+
 }

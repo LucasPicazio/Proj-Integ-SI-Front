@@ -19,23 +19,38 @@ namespace PSI_FRONT.Services
 
         public async Task<List<Product>> GetAllProducts()
         {
-            var response = await _httpService.Get<List<Product>>("api/product/search");
-            if (response.Success)
+            var productResultList = new List<Product>();
+            try
             {
-                return response.Response;
+                var response = await _httpService.Get<List<Product>>("api/product/search");
+                if (response.Success)
+                {
+                    productResultList = response.Response;
+                }
             }
-            return null;
+            catch (Exception)
+            {
+                return productResultList;
+            }
+            return productResultList;
         }
 
         public async Task<List<Product>> SearchProduct(string searchItem)
         {
-            var response = await _httpService.Get<List<Product>>($"api/product/search/{searchItem}");
-            if (response.Success)
+            var productResultList = new List<Product>();
+            try
             {
-                var productResultList = response.Response;
-                return productResultList.OrderBy(p => p.ProductType).ThenBy(p => p.Price).ToList();
+                var response = await _httpService.Get<List<Product>>($"api/product/search/{searchItem}");
+                if (response.Success)
+                {
+                    productResultList = response.Response;
+                }
             }
-            return null;
+            catch (Exception)
+            {
+                return productResultList;
+            }
+            return productResultList.OrderBy(p => p.ProductType).ThenBy(p => p.Price).ToList();
         }
 
         public async Task<Product> GetProductByName(string prodName)
@@ -49,16 +64,34 @@ namespace PSI_FRONT.Services
             return null;
         }
 
-        public async Task<bool> PostProduct(Product prod)
+        public async Task<Product> GetProductById(int prodId)
         {
+            var result = new Product();
             try
             {
-                var response = await _httpService.Post("api/product/save", prod);
-                return response.Success;
+                var response = await _httpService.Get<Product>($"api/product/search/id/{prodId}");
+                if (response.Success)
+                {
+                    result = response.Response;
+                }
             }
             catch (Exception)
             {
-                return false;
+                return result;
+            }
+            return result;
+        }
+
+        public async Task<int> PostProduct(Product prod)
+        {
+            try
+            {
+                var response = await _httpService.Post<Product, int>("api/product/save", prod);
+                return response.Response;
+            }
+            catch (Exception)
+            {
+                return -1;
             }
         }
     }

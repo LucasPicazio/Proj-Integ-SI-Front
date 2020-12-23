@@ -1,4 +1,6 @@
-﻿<div id="@CarouselId" class="carousel slide" data-ride="carousel" data-interval="3000" data-pause="hover">
+﻿@inject IJSRuntime js
+
+<div id="@CarouselId" class="carousel slide" data-ride="carousel" data-interval="3000" data-pause="hover">
     <ol class="carousel-indicators">
         @IndicatorsTemplate
     </ol>
@@ -19,4 +21,12 @@
     [Parameter] public string CarouselId { get; set; }
     [Parameter] public RenderFragment IndicatorsTemplate { get; set; }
     [Parameter] public RenderFragment ImagesTemplate { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await js.InvokeVoidAsync("InitializeCarousel");
+        }
+    }
 }

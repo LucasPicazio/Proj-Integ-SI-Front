@@ -9,5 +9,6 @@ namespace PSI_FRONT.Services
         public Task<bool> AddUserAsync(User newUser);
         Task Logout();
         Task<bool> Login(User user);
+        Task<int> GetUserIdFromToken();
     }
 }
